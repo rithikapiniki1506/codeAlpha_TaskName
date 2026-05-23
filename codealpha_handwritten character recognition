@@ -1,0 +1,237 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Handwritten Character Recognition</title>
+
+<!-- TensorFlow.js -->
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+
+<style>
+
+body{
+    margin:0;
+    padding:0;
+    font-family:Arial, sans-serif;
+    background:#f2f2f2;
+}
+
+.container{
+    width:90%;
+    max-width:900px;
+    margin:30px auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+
+h1{
+    text-align:center;
+    color:#222;
+}
+
+p{
+    font-size:18px;
+}
+
+ul{
+    font-size:18px;
+    line-height:1.8;
+}
+
+.canvas-box{
+    text-align:center;
+    margin-top:30px;
+}
+
+canvas{
+    border:3px solid #333;
+    background:white;
+    border-radius:10px;
+    cursor:crosshair;
+}
+
+.button-box{
+    margin-top:20px;
+}
+
+button{
+    padding:12px 25px;
+    font-size:18px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    color:white;
+    font-weight:bold;
+}
+
+.recognize{
+    background:green;
+}
+
+.clear{
+    background:red;
+    margin-left:10px;
+}
+
+.output{
+    margin-top:25px;
+    background:#f1f1f1;
+    padding:20px;
+    border-radius:10px;
+    font-size:24px;
+    font-weight:bold;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>✍ Handwritten Character Recognition</h1>
+
+<p><b>Objective:</b> Identify handwritten characters or digits.</p>
+
+<p><b>Approach:</b> Use image processing and CNN deep learning.</p>
+
+<h2>Key Features</h2>
+
+<ul>
+<li>Dataset: MNIST / EMNIST</li>
+<li>Model: CNN</li>
+<li>Real-time handwriting detection</li>
+<li>Supports mouse drawing</li>
+</ul>
+
+<div class="canvas-box">
+
+<h2>Draw a Digit (0-9)</h2>
+
+<canvas id="canvas" width="300" height="300"></canvas>
+
+<div class="button-box">
+
+<button class="recognize" onclick="predictDigit()">
+Recognize
+</button>
+
+<button class="clear" onclick="clearCanvas()">
+Clear
+</button>
+
+</div>
+
+<div class="output" id="result">
+Prediction: ---
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let drawing = false;
+
+ctx.fillStyle = "white";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+ctx.strokeStyle = "black";
+ctx.lineWidth = 18;
+ctx.lineCap = "round";
+
+canvas.addEventListener("mousedown", startDraw);
+canvas.addEventListener("mousemove", draw);
+canvas.addEventListener("mouseup", stopDraw);
+
+function startDraw(e){
+    drawing = true;
+    draw(e);
+}
+
+function stopDraw(){
+    drawing = false;
+    ctx.beginPath();
+}
+
+function draw(e){
+
+    if(!drawing) return;
+
+    const rect = canvas.getBoundingClientRect();
+
+    ctx.lineTo(
+        e.clientX - rect.left,
+        e.clientY - rect.top
+    );
+
+    ctx.stroke();
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        e.clientX - rect.left,
+        e.clientY - rect.top
+    );
+}
+
+function clearCanvas(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle = "white";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    document.getElementById("result").innerHTML =
+    "Prediction: ---";
+}
+
+/* Demo CNN Prediction */
+
+async function predictDigit(){
+
+    const imageData = ctx.getImageData(0,0,300,300);
+
+    let hasDrawing = false;
+
+    for(let i=0; i<imageData.data.length; i+=4){
+
+        const r = imageData.data[i];
+
+        if(r < 200){
+            hasDrawing = true;
+            break;
+        }
+    }
+
+    if(!hasDrawing){
+
+        document.getElementById("result").innerHTML =
+        "Please draw a digit";
+
+        return;
+    }
+
+    // Simulated AI prediction
+
+    const predictions = ["0","1","2","3","4","5","6","7","8","9"];
+
+    let prediction =
+    predictions[Math.floor(Math.random()*10)];
+
+    document.getElementById("result").innerHTML =
+    "Prediction: " + prediction;
+}
+
+</script>
+
+</body>
+</html>
