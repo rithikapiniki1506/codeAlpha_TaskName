@@ -1,0 +1,181 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Emotion Recognition from Speech</title>
+
+<style>
+
+body{
+    margin:0;
+    padding:0;
+    font-family:Arial;
+    background:#f2f2f2;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.container{
+    width:450px;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    text-align:center;
+    box-shadow:0px 0px 15px gray;
+}
+
+h1{
+    color:#333;
+}
+
+p{
+    color:#666;
+}
+
+button{
+    padding:12px 20px;
+    font-size:18px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    margin-top:20px;
+}
+
+#startBtn{
+    background:green;
+    color:white;
+}
+
+#stopBtn{
+    background:red;
+    color:white;
+    margin-left:10px;
+}
+
+#result{
+    margin-top:30px;
+    font-size:28px;
+    font-weight:bold;
+    color:blue;
+}
+
+#speechText{
+    margin-top:20px;
+    color:#444;
+    font-size:18px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🎤 Emotion Recognition</h1>
+
+    <p>Speak something to detect emotion</p>
+
+    <button id="startBtn">Start</button>
+
+    <button id="stopBtn">Stop</button>
+
+    <div id="speechText">
+        Speech: None
+    </div>
+
+    <div id="result">
+        Emotion: None
+    </div>
+
+</div>
+
+<script>
+
+let recognition;
+
+if ('webkitSpeechRecognition' in window) {
+
+    recognition = new webkitSpeechRecognition();
+
+    recognition.continuous = true;
+    recognition.lang = "en-US";
+
+    document.getElementById("startBtn").onclick = function(){
+
+        recognition.start();
+
+        document.getElementById("speechText").innerHTML =
+        "Listening... 🎙";
+
+    };
+
+    document.getElementById("stopBtn").onclick = function(){
+
+        recognition.stop();
+
+    };
+
+    recognition.onresult = function(event){
+
+        let text =
+        event.results[event.results.length - 1][0]
+        .transcript.toLowerCase();
+
+        document.getElementById("speechText").innerHTML =
+        "Speech: " + text;
+
+        let emotion = "Neutral 😐";
+
+        if(
+            text.includes("happy") ||
+            text.includes("good") ||
+            text.includes("great") ||
+            text.includes("awesome")
+        ){
+            emotion = "Happy 😄";
+        }
+
+        else if(
+            text.includes("sad") ||
+            text.includes("cry") ||
+            text.includes("upset")
+        ){
+            emotion = "Sad 😢";
+        }
+
+        else if(
+            text.includes("angry") ||
+            text.includes("hate") ||
+            text.includes("annoyed")
+        ){
+            emotion = "Angry 😠";
+        }
+
+        else if(
+            text.includes("fear") ||
+            text.includes("scared")
+        ){
+            emotion = "Fear 😨";
+        }
+
+        document.getElementById("result").innerHTML =
+        "Emotion: " + emotion;
+
+    };
+
+}
+else{
+
+    alert("Speech Recognition not supported in this browser");
+
+}
+
+</script>
+
+</body>
+</html>
